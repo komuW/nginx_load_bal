@@ -51,6 +51,11 @@
   notify: 
    - reload nginx
 
+- name: add proxy conf file 
+  template: src=proxy.conf.j2 dest=/etc/etc/nginx/proxy.conf
+  notify: 
+   - reload nginx
+
 - name: start the nginx service
   service: name=nginx state=started enabled=yes
 
