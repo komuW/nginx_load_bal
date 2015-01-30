@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 from datetime import timedelta, datetime
 
-from celery.schedules import crontab
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 

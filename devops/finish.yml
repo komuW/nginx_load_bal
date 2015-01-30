@@ -30,7 +30,7 @@
         - migrate
 
     - name: runserver
-      command: python manage.py runserver 0.0.0.0:{{APP_PORT}} --settings=settings.development
+      command: python manage.py runserver 0.0.0.0:4700 --settings=settings.development
 
   handlers:
 

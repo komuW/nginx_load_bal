@@ -18,5 +18,5 @@ supervisord.conf
 #log dir/files
 log
 
-
-
+#static
+static/
