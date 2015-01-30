@@ -1,0 +1,35 @@
+---
+- hosts: all
+  gather_facts: no
+  sudo: yes
+
+  tasks:
+
+    - name: create nginx geoip dir
+      command: mkdir -p /etc/nginx/geoip
+
+    - name: wget geoIP database
+      shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz chdir=/etc/nginx/geoip
+
+    - name: unzip geoip file
+      shell: gunzip GeoIP.dat.gz chdir=/etc/nginx/geoip
+      notify:
+        - restart nginx
+
+    - name: wget geolite database
+      shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
+
+    - name: unzip geolite file
+      shell: gunzip GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
+      notify:
+        - restart nginx
+
+    - name: Install django app requirements.
+      pip: >
+        requirements={{ APP_DIR }}/requirements/development.txt
+
+  handlers:
+
+    - name: restart nginx
+      service: name=nginx state=reloaded
+
