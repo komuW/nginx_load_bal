@@ -17,6 +17,9 @@ events {
 
 http {
 
+        geoip_country  /etc/nginx/geoip/GeoIP.dat; # the country IP database
+        geoip_city     /etc/nginx/geoip/GeoLiteCity.dat; # the city IP database
+
         include /etc/nginx/mime.types;
         default_type application/octet-stream;
 
