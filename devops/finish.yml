@@ -5,7 +5,9 @@
 
   vars:
     - APP_DIR: /vagrant
-    - APP_PORT: 4700
+    - APP_PORT: 3000
+    - APP_NAME: django_app
+    - APP_STATIC_DIR: "{{ APP_DIR }}/static"
 
   tasks:
 
@@ -14,6 +16,22 @@
       with_items:
         - python-pip
         - make
+
+    - name: Create app nginx site configuration
+      template: src=./templates/app_nginx.site.conf.j2 
+                dest=/etc/nginx/sites-available/{{ APP_NAME }}
+      notify: 
+        - restart nginx
+
+    - name: Create link to enable nginx site
+      file: path=/etc/nginx/sites-enabled/{{ APP_NAME }}
+            src=/etc/nginx/sites-available/{{ APP_NAME }}
+            state=link
+      notify:
+        - restart nginx
+
+    - name: restart nginx
+      service: name=nginx state=reloaded
 
     - name: Install django app requirements.
       pip: >
