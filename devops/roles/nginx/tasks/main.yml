@@ -52,9 +52,28 @@
    - reload nginx
 
 - name: add proxy conf file 
-  template: src=proxy.conf.j2 dest=/etc/etc/nginx/proxy.conf
+  template: src=proxy.conf.j2 dest=/etc/nginx/proxy.conf
   notify: 
    - reload nginx
+
+- name: create nginx geoip dir
+  command: mkdir -p /etc/nginx/geoip
+
+- name: wget geoIP database
+  shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz chdir=/etc/nginx/geoip
+
+- name: unzip geoip file
+  shell: gunzip -fq GeoIP.dat.gz chdir=/etc/nginx/geoip
+  notify:
+    - reload nginx
+
+- name: wget geolite database
+  shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
+
+- name: unzip geolite file
+  shell: gunzip -fq GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
+  notify:
+    - reload nginx
 
 - name: start the nginx service
   service: name=nginx state=started enabled=yes

@@ -3,33 +3,38 @@
   gather_facts: no
   sudo: yes
 
+  vars:
+    - APP_DIR: /vagrant
+    - APP_PORT: 4700
+
   tasks:
 
-    - name: create nginx geoip dir
-      command: mkdir -p /etc/nginx/geoip
-
-    - name: wget geoIP database
-      shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz chdir=/etc/nginx/geoip
-
-    - name: unzip geoip file
-      shell: gunzip GeoIP.dat.gz chdir=/etc/nginx/geoip
-      notify:
-        - restart nginx
-
-    - name: wget geolite database
-      shell: wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
-
-    - name: unzip geolite file
-      shell: gunzip GeoLiteCity.dat.gz chdir=/etc/nginx/geoip
-      notify:
-        - restart nginx
+    - name: Install system packages
+      apt: pkg={{ item }} state=present
+      with_items:
+        - python-pip
 
     - name: Install django app requirements.
       pip: >
         requirements={{ APP_DIR }}/requirements/development.txt
+
+    - name: migrate db
+      django_manage: >
+        app_path={{ APP_DIR }} 
+        settings=settings.development
+        command={{ item }} 
+      with_items:
+        - validate
+        - collectstatic
+        - syncdb
+        - migrate
+
+    - name: runserver
+      command: python manage.py runserver 0.0.0.0:{{APP_PORT}} --settings=settings.development
 
   handlers:
 
     - name: restart nginx
       service: name=nginx state=reloaded
 
+# a good resource: https://www.howtoforge.com/using-geoip-with-nginx-on-ubuntu-12.04
