@@ -13,6 +13,6 @@ if [[ ! $(ansible --version 2> /dev/null) =~ 1\.6 ]]; then
 	sudo apt-get -y install ansible
 fi
 
-PYTHONUNBUFFERED=1 ansible-playbook /vagrant/devops/configure.yml \
+PYTHONUNBUFFERED=1 ansible-playbook /vagrant/devops/start.yml \
     --inventory-file=/vagrant/devops/development \
     --connection=local
