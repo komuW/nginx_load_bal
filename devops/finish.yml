@@ -49,7 +49,7 @@
         - migrate
 
     - name: runserver
-      command: make run chdir=/vagrant
+      command: make run && make run2 chdir=/vagrant
 
   handlers:
 
