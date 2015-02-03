@@ -16,6 +16,8 @@
       with_items:
         - python-pip
         - make
+        - curl
+        - supervisor
 
     - name: Create app nginx site configuration
       template: src=./templates/app_nginx.site.conf.j2 
@@ -48,12 +50,34 @@
         - syncdb
         - migrate
 
-    - name: runserver
-      command: make run && make run2 chdir=/vagrant
+    - name: Configure supervisord
+      template: src=templates/supervisor.j2 
+                dest={{ APP_DIR }}/supervisord.conf
+      notify: 
+        - restart supervisord
+
+    - name: Kill all supervisord
+      command: killall supervisord
+      ignore_errors: yes
+      sudo: yes
+      sudo_user: root
+
+    - name: Wait for supervisor to clean up and exit
+      pause: seconds=8
+
+    - name: Start supervisord
+      command: supervisord -c {{ APP_DIR }}/supervisord.conf
+      sudo: yes
+      sudo_user: root
 
   handlers:
 
     - name: restart nginx
-      service: name=nginx state=reloaded
+      service: name=nginx state=restarted
+      sudo: yes
+
+    - name: restart supervisord
+      service: name=supervisor state=restarted enabled=yes
+      sudo: yes
 
 # a good resource: https://www.howtoforge.com/using-geoip-with-nginx-on-ubuntu-12.04

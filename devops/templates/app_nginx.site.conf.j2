@@ -2,17 +2,53 @@ log_format timed_combined '$remote_addr - $remote_user [$time_local]  '
                           '"$request" $status $body_bytes_sent '
                           '"$http_referer" "$http_user_agent" $request_time';
 
-upstream myapp {
-        server 127.0.0.1:3000;
+#1. round robbin
+#All requests are proxied to the server group myapp1, 
+#and nginx applies HTTP load balancing to distribute the requests
+
+upstream myapp_round_robbin_example {
         server 127.0.0.1:4500;
+        server 127.0.0.1:3000;
     }
+
+
+#2. Least-connected
+#nginx will try not to overload a busy application server with excessive requests
+
+upstream myapp_least_connected_example {
+        least_conn;
+        server 127.0.0.1:4500;
+        server 127.0.0.1:3000;
+    }
+
+#NB: with round robin and least connected methods, there's no seession persistence
+
+#3. ip-hash
+#This method ensures that the requests from the same client 
+#will always be directed to the same server except when this server is unavailable.
+
+upstream myapp_ip_hash_example {
+        ip_hash;
+        server 127.0.0.1:4500;
+        server 127.0.0.1:3000;
+    }
+
+#4. weighted
+#for each of the above methods, you can add a weight to a server and this will be
+#taken into account when balancing. eg
+upstream myapp_round_robbin_with_weight_example {
+        server 127.0.0.1:4500 weight=3;
+        server 127.0.0.1:3000;
+    }
+
+
+
 
 server {
     listen 0.0.0.0:4700;
-    access_log /var/log/nginx/access.log timed_combined;
-    
+
     location / {
-        proxy_pass http://myapp;
+        proxy_pass http://myapp_round_robbin_example;
         proxy_set_header Host $http_host;
         proxy_redirect off;
     }
