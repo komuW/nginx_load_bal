@@ -19,6 +19,9 @@
         - curl
         - supervisor
 
+    - name: create log dir 
+      shell: mkdir -p log chdir={{APP_DIR}}
+
     - name: Create app nginx site configuration
       template: src=./templates/app_nginx.site.conf.j2 
                 dest=/etc/nginx/sites-available/{{ APP_NAME }}

@@ -16,15 +16,15 @@ serverurl=http://127.0.0.1:9012 ; use an http:// url to specify an inet socket
 [program:runserver]
 directory={{ APP_DIR }}
 command=python manage.py runserver 0.0.0.0:3000 --settings=settings.development
-stdout_logfile={{ APP_DIR }}/%(program_name)s.log
-stderr_logfile={{ APP_DIR }}/%(program_name)s.log
+stdout_logfile={{ APP_DIR }}/log/%(program_name)s.log
+stderr_logfile={{ APP_DIR }}/log/%(program_name)s.log
 stopasgroup=true
 startsecs=5
 
 [program:runserver2]
 directory={{ APP_DIR }}
 command=python manage.py runserver 0.0.0.0:4500 --settings=settings.development
-stdout_logfile={{ APP_DIR }}/%(program_name)s.log
-stderr_logfile={{ APP_DIR }}/%(program_name)s.log
+stdout_logfile={{ APP_DIR }}/log/%(program_name)s.log
+stderr_logfile={{ APP_DIR }}/log/%(program_name)s.log
 stopasgroup=true
 startsecs=5
